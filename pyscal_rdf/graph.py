@@ -3,6 +3,7 @@ from rdflib.store import NO_STORE, VALID_STORE
 
 import os
 import numpy as np
+import uuid
 
 from pyscal_rdf.visualize import visualize_graph
 from pyscal_rdf.rdfutils import convert_to_dict
@@ -11,6 +12,7 @@ from pyscal.atoms import Atoms
 from pyscal.core import System
 
 CMSO = Namespace("https://purls.helmholtz-metadaten.de/cmso/")
+ExN = Namespace("http://example.org/cmso/")
 
 defstyledict = {
     "BNode": {"color": "#ffe6ff", 
@@ -28,6 +30,10 @@ defstyledict = {
                 "fontsize": "8"},
 }
 
+def _name(name):
+    if name is None:
+        return ExN[str(uuid.uuid4())]
+    
 def _replace_keys(refdict, indict):
     for key, val in indict.items():
         if key in refdict.keys():
@@ -88,26 +94,30 @@ class StructureGraph:
         self.add_atoms()
         
     def add_sample(self, name=None):
-        sample_01 = BNode(name)
+        #sample_01 = BNode(name)
+        sample_01 = URIRef(_name(name))
         self.graph.add((sample_01, RDF.type, CMSO.AtomicScaleSample))
         self.sample = sample_01
     
     def add_material(self, name=None):
-        material_01 = BNode(name)
+        #material_01 = BNode(name)
+        material_01 = URIRef(_name(name))
         self.graph.add((self.sample, CMSO.hasMaterial, material_01))
         self.graph.add((material_01, RDF.type, CMSO.CrystallineMaterial))        
         self.material = material_01
     
     def add_chemical_composition(self, name=None):
         chem_comp = ["=".join([x, str(y)]) for x,y in zip(self.sysdict["ChemicalCompositionElement"], self.sysdict["ChemicalCompositionRatio"])]
-        chemical_composition_01 = BNode(name)
+        #chemical_composition_01 = BNode(name)
+        chemical_composition_01 = URIRef(_name(name))
         self.graph.add((self.material, CMSO.hasComposition, chemical_composition_01))
         self.graph.add((chemical_composition_01, RDF.type, CMSO.ChemicalComposition))
         for x in range(len(chem_comp)):
             self.graph.add((chemical_composition_01, CMSO.hasElementRatio, Literal(chem_comp[x], datatype=XSD.string)))
     
     def add_simulation_cell(self, name=None):
-        simulation_cell_01 = BNode(name)
+        #simulation_cell_01 = BNode(name)
+        simulation_cell_01 = URIRef(_name(name))
         self.graph.add((self.sample, CMSO.hasSimulationCell, simulation_cell_01))
         self.graph.add((simulation_cell_01, RDF.type, CMSO.SimulationCell))
         self.graph.add((simulation_cell_01, CMSO.hasVolume, Literal(np.round(self.sysdict["CellVolume"], decimals=2), datatype=XSD.float)))
@@ -119,7 +129,8 @@ class StructureGraph:
         uname = None
         if name is not None:
             uname = f'{name}Length'
-        simulation_cell_length_01 = BNode(uname)
+        #simulation_cell_length_01 = BNode(uname)
+        simulation_cell_length_01 = URIRef(_name(uname))
         self.graph.add((self.simulation_cell, CMSO.hasLength, simulation_cell_length_01))
         self.graph.add((simulation_cell_length_01, RDF.type, CMSO.SimulationCellLength))
         self.graph.add((simulation_cell_length_01, CMSO.hasLength_x, Literal(self.sysdict["SimulationCellLengthX"], datatype=XSD.float)))
@@ -129,7 +140,8 @@ class StructureGraph:
         uname = None
         if name is not None:
             uname = f'{name}Vector01'
-        simulation_cell_vector_01 = BNode(uname)
+        #simulation_cell_vector_01 = BNode(uname)
+        simulation_cell_vector_01 = URIRef(_name(uname))
         self.graph.add((self.simulation_cell, CMSO.hasVector, simulation_cell_vector_01))
         self.graph.add((simulation_cell_vector_01, RDF.type, CMSO.SimulationCellVector))
         self.graph.add((simulation_cell_vector_01, CMSO.hasComponent_x, Literal(self.sysdict["SimulationCellVectorA"][0], datatype=XSD.float)))
@@ -139,7 +151,8 @@ class StructureGraph:
         uname = None
         if name is not None:
             uname = f'{name}Vector02'
-        simulation_cell_vector_02 = BNode(uname)
+        #simulation_cell_vector_02 = BNode(uname)
+        simulation_cell_vector_02 = URIRef(_name(uname))
         self.graph.add((self.simulation_cell, CMSO.hasVector, simulation_cell_vector_02))
         self.graph.add((simulation_cell_vector_02, RDF.type, CMSO.SimulationCellVector))
         self.graph.add((simulation_cell_vector_02, CMSO.hasComponent_x, Literal(self.sysdict["SimulationCellVectorB"][0], datatype=XSD.float)))
@@ -149,7 +162,8 @@ class StructureGraph:
         uname = None
         if name is not None:
             uname = f'{name}Vector03'
-        simulation_cell_vector_03 = BNode(uname)
+        #simulation_cell_vector_03 = BNode(uname)
+        simulation_cell_vector_03 = URIRef(_name(uname))
         self.graph.add((self.simulation_cell, CMSO.hasVector, simulation_cell_vector_03))
         self.graph.add((simulation_cell_vector_03, RDF.type, CMSO.SimulationCellVector))
         self.graph.add((simulation_cell_vector_03, CMSO.hasComponent_x, Literal(self.sysdict["SimulationCellVectorC"][0], datatype=XSD.float)))
@@ -159,7 +173,8 @@ class StructureGraph:
         uname = None
         if name is not None:
             uname = f'{name}Angle'
-        simulation_cell_angle_01 = BNode(uname)
+        #simulation_cell_angle_01 = BNode(uname)
+        simulation_cell_angle_01 = URIRef(_name(uname))
         self.graph.add((self.simulation_cell, CMSO.hasAngle, simulation_cell_angle_01))
         self.graph.add((simulation_cell_angle_01, RDF.type, CMSO.SimulationCellAngle))
         self.graph.add((simulation_cell_angle_01, CMSO.hasAngle_alpha, Literal(self.sysdict["SimulationCellAngleAlpha"], datatype=XSD.float)))
@@ -168,14 +183,16 @@ class StructureGraph:
         
     
     def add_crystal_structure(self, name=None):
-        crystal_structure_01 = BNode(name)
+        #crystal_structure_01 = BNode(name)
+        crystal_structure_01 = URIRef(_name(name))
         self.graph.add((self.material, CMSO.hasStructure, crystal_structure_01))
         self.graph.add((crystal_structure_01, RDF.type, CMSO.CrystalStructure))
         self.graph.add((crystal_structure_01, CMSO.hasAltName, Literal(self.sysdict["CrystalStructureName"], datatype=XSD.string)))
         self.crystal_structure = crystal_structure_01
         
     def add_space_group(self, name=None):
-        space_group_01 = BNode(name)
+        #space_group_01 = BNode(name)
+        space_group_01 = URIRef(_name(name))
         self.graph.add((self.crystal_structure, CMSO.hasSpaceGroup, space_group_01))
         self.graph.add((space_group_01, RDF.type, CMSO.SpaceGroup))
         self.graph.add((space_group_01, CMSO.hasSpaceGroupSymbol, Literal(self.sysdict["SpaceGroupSymbol"], datatype=XSD.string)))
@@ -183,7 +200,8 @@ class StructureGraph:
     
             
     def add_unit_cell(self, name=None):
-        unit_cell_01 = BNode(name)
+        #unit_cell_01 = BNode(name)
+        unit_cell_01 = URIRef(_name(name))
         self.graph.add((self.crystal_structure, CMSO.hasUnitCell, unit_cell_01))
         self.graph.add((unit_cell_01, RDF.type, CMSO.UnitCell))
         self.unit_cell = unit_cell_01
@@ -192,7 +210,8 @@ class StructureGraph:
         uname = None
         if name is not None:
             uname = f'Bravais{name}'
-        bravaislattice = BNode(uname)
+        #bravaislattice = BNode(uname)
+        bravaislattice = URIRef(_name(uname))
         self.graph.add((self.unit_cell, CMSO.hasLattice, bravaislattice))
         self.graph.add((bravaislattice, RDF.type, CMSO.BravaisLattice))
         self.graph.add((bravaislattice, CMSO.hasLatticeSystem, Literal(self.sysdict["BravaisLattice"], datatype=XSD.string)))
@@ -201,7 +220,8 @@ class StructureGraph:
         uname = None
         if name is not None:
             uname = f'{name}LatticeParameter'
-        lattice_parameter_01 = BNode(uname)
+        #lattice_parameter_01 = BNode(uname)
+        lattice_parameter_01 = URIRef(_name(uname))
         self.graph.add((self.unit_cell, CMSO.hasLatticeParamter, lattice_parameter_01))
         self.graph.add((lattice_parameter_01, RDF.type, CMSO.LatticeParameter))
         self.graph.add((lattice_parameter_01, CMSO.hasLength_x, Literal(self.sysdict["LatticeParameter"], datatype=XSD.float)))
@@ -211,7 +231,8 @@ class StructureGraph:
         uname = None
         if name is not None:
             uname = f'{name}LatticeAngle'
-        lattice_angle_01 = BNode(uname)
+        #lattice_angle_01 = BNode(uname)
+        lattice_angle_01 = URIRef(_name(uname))
         self.graph.add((self.unit_cell, CMSO.hasAngle, lattice_angle_01))
         self.graph.add((lattice_angle_01, RDF.type, CMSO.LatticeAngle))
         self.graph.add((lattice_angle_01, CMSO.hasAngle_alpha, Literal(90, datatype=XSD.float)))
@@ -221,10 +242,12 @@ class StructureGraph:
     def add_atoms(self, name=None):
         for x in range(len(self.sysdict["Positions"])):
             #create atom
-            atom = BNode()
+            #atom = BNode()
+            atom = URIRef(_name(None))
             self.graph.add((self.sample, CMSO.hasAtom, atom))
             self.graph.add((atom, RDF.type, CMSO.Atom))
-            position = BNode()
+            #position = BNode()
+            position = URIRef(_name(None))
             self.graph.add((atom, CMSO.hasPositionVector, position))
             self.graph.add((position, RDF.type, CMSO.PositionVector))
             self.graph.add((position, CMSO.hasComponent_x, Literal(self.sysdict["Positions"][x][0],
@@ -234,7 +257,8 @@ class StructureGraph:
             self.graph.add((position, CMSO.hasComponent_z, Literal(self.sysdict["Positions"][x][2],
                                                                   datatype=XSD.float)))
             #now add coordination
-            element = BNode()
+            #element = BNode()
+            element = URIRef(_name(None))
             self.graph.add((atom, CMSO.hasElement, element))
             self.graph.add((element, RDF.type, CMSO.Element))
             self.graph.add((element, CMSO.hasSymbol, Literal(str(self.sysdict["Element"][x]),
