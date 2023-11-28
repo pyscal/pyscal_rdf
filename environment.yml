@@ -18,3 +18,4 @@ dependencies:
   - sqlalchemy <2.0.0
   - rdflib-sqlalchemy
   - jupyter-book
+  - pydantic >=2.3.0
