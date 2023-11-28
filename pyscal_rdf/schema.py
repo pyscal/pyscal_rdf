@@ -25,17 +25,17 @@ class CalculatedProperty(BaseModel, title='calculated property'):
 class SimulationCell(BaseModel, title='Simulation cell'):
 	volume: Annotated[float, Field(default=0, ge=0)]
 	number_of_atoms: Annotated[int, Field(default=0, ge=0)]
-	length: Annotated[conlist(float, min_length=3, max_length=3), Field(default=0, ge=0)]
+	length: Annotated[conlist(float, min_length=3, max_length=3), Field(default=[0,0,0])]
 	vector: Annotated[conlist(conlist(float, min_length=3, max_length=3), 
-		min_length=3, max_length=3), Field(default=0)]
-	angle: Annotated[conlist(float, min_length=3, max_length=3), Field(default=0, ge=0)]
+		min_length=3, max_length=3), Field(default=None)]
+	angle: Annotated[conlist(float, min_length=3, max_length=3), Field(default=[0,0,0])]
 	vacancy_concentration: Annotated[float, Field(default=0, ge=0)]
 	number_of_vacancies: Annotated[int, Field(default=0, ge=0)]
 
 class UnitCell(BaseModel, title='Unit cell'):
 	bravais_lattice: Annotated[str, Field(default=None, required=False)]
 	lattice_parameter: Annotated[Union[float, conlist(float, min_length=3, max_length=3)],
-		Field(default=0), required=False]
+		Field(default=0, required=False)]
 	angle: Annotated[conlist(float, min_length=3, max_length=3), Field(default=[90.0, 90.0, 90.0],
 		required=False)]
 
@@ -56,15 +56,15 @@ class Defect(BaseModel, title='General defect class'):
 	grain_boundary: Optional[GrainBoundary] = GrainBoundary()
 
 class Material(BaseModel, title='Material'):
-	element_ratio: Annotated[dict]
+	element_ratio: Annotated[dict, Field(default={})]
 	crystal_structure: Optional[CrystalStructure] = CrystalStructure()
 	defect: Optional[Defect] = Defect()
-	
+
 class Sample(BaseModel, title='Sample'):
 	material: Optional[Material] = Material()
 	simulation_cell: Optional[SimulationCell] = SimulationCell()
-	calculated_property[CalculatedProperty] = CalculatedProperty()
-
+	calculated_property: Optional[CalculatedProperty] = CalculatedProperty()
+	#pass
 
 
 
